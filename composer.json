@@ -1,0 +1,20 @@
+{
+    "name": "mv/roadlength",
+    "type": "library",
+    "description": "PHP connector to calc road distance between locations",
+    "keywords": ["road distance", "distance between location"],
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Michael VEROUX",
+            "homepage": "https://github.com/phpmike"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Mv\\RoadLength\\": "lib/" }
+    },
+    "require": {
+        "php": ">=7.0"
+    },
+    "minimum-stability": "dev"
+}
