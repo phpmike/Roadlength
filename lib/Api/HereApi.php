@@ -10,6 +10,8 @@
 
 namespace Mv\RoadLength\Api;
 
+use Mv\RoadLength\Exception\UnavailableException;
+use Mv\RoadLength\Exception\UnexpectedException;
 use Mv\RoadLength\Geo\LocationInterface;
 
 /**
@@ -45,6 +47,7 @@ class HereApi implements ApiDistanceInterface, ApiGeolocInterface
      *
      * @return array
      *
+     * @throws UnavailableException
      * @author Michaël VEROUX
      */
     public function getRoutes(LocationInterface $from, LocationInterface $to)
@@ -60,6 +63,10 @@ class HereApi implements ApiDistanceInterface, ApiGeolocInterface
         $url = sprintf('%s?%s', self::ROUTES_URL, http_build_query($params));
         $routes = file_get_contents($url);
 
+        if (false === $routes) {
+            throw new UnavailableException('Response API error!'.var_export($http_response_header, true));
+        }
+
         return json_decode($routes, true);
     }
 
@@ -69,6 +76,7 @@ class HereApi implements ApiDistanceInterface, ApiGeolocInterface
      *
      * @return null|int
      *
+     * @throws UnexpectedException
      * @author Michaël VEROUX
      */
     public function getDistance(LocationInterface $from, LocationInterface $to)
@@ -80,6 +88,8 @@ class HereApi implements ApiDistanceInterface, ApiGeolocInterface
             if (isset($section[self::RETURN_MODE])) {
                 return $section[self::RETURN_MODE]['length'];
             }
+        } else {
+            throw new UnexpectedException('Unexpected response format from API!');
         }
 
         return null;
@@ -89,8 +99,9 @@ class HereApi implements ApiDistanceInterface, ApiGeolocInterface
      * @param string $address
      * @param string $class
      *
-     * @return LocationInterface|null
+     * @return LocationInterface
      *
+     * @throws UnavailableException|UnexpectedException
      * @author Michaël VEROUX
      */
     public function getLocation($address, $class)
@@ -109,6 +120,10 @@ class HereApi implements ApiDistanceInterface, ApiGeolocInterface
         $url = sprintf('%s?%s', self::GEOCODE_URL, http_build_query($params));
         $geocoding = file_get_contents($url);
 
+        if (false === $geocoding) {
+            throw new UnavailableException('Response API error!');
+        }
+
         $geocoding = json_decode($geocoding, true);
 
         if (isset($geocoding['items']) && isset($geocoding['items'][0])) {
@@ -121,6 +136,6 @@ class HereApi implements ApiDistanceInterface, ApiGeolocInterface
 
         }
 
-        return null;
+        throw new UnexpectedException('Unexpected response format from API!');
     }
 }

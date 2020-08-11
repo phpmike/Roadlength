@@ -11,6 +11,7 @@
 namespace Mv\RoadLength\Geo;
 
 use Mv\RoadLength\Api\ApiDistanceInterface;
+use Mv\RoadLength\Exception\UnexpectedException;
 
 /**
  * Class Distance.
@@ -79,6 +80,10 @@ class Distance implements DistanceInterface
      */
     public function getDistance()
     {
+        if (!$this->startLocation instanceof LocationInterface || !$this->endLocation instanceof LocationInterface) {
+            throw new UnexpectedException('You must have start and end location to calculate the distance!');
+        }
+
         $distance = $this->api->getDistance($this->startLocation, $this->endLocation);
 
         return $distance;
